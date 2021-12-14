@@ -112,14 +112,14 @@ userSchema.methods.generatePasswordResetToken = function () {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  console.log({ resetToken }, this.passwordResetToken);
+  // console.log({ resetToken }, this.passwordResetToken);
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
 
 userSchema.methods.protectBruteAtt = function () {
   this.numAttempts -= 1;
-  console.log(this.numAttempts);
+  // console.log(this.numAttempts);
   if (this.numAttempts === 0) {
     this.numAttempts = 10;
     this.waitTimeAfterFailedLogin = Date.now() + 15 * 1000;
