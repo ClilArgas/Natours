@@ -6,7 +6,6 @@ const AppError = require('./../utils/appError');
 
 exports.alert = (req, res, next) => {
   const { alert } = req.query;
-  console.log(alert);
   if (alert === 'booking')
     res.locals.alert =
       "Your booking was successful! Please check you email for a confirmation. If your booking doesn't show up here Please come back later.";
