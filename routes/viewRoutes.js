@@ -21,6 +21,11 @@ router.get(
   authController.isLoggedIn,
   viewController.getForgotPasswordForm
 );
+router.get(
+  '/reset-password/:token',
+  authController.isLoggedIn,
+  viewController.getResetPasswordForm
+);
 router.get('/me', authController.protect, viewController.getAccount);
 router.get('/my-tours', authController.protect, viewController.getMyTours);
 

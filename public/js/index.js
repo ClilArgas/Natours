@@ -4,7 +4,7 @@ import { displayMap } from './mapbox.js';
 import { login, logout } from './login.js';
 import { updateSettings } from './updateSettings.js';
 import { signup } from './signup.js';
-import { forgotPassword } from './forgotPassword.js';
+import { forgotPassword, resetPassword } from './forgotPassword.js';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
 //DOM ELEMENTS
@@ -16,6 +16,7 @@ const userDataForm = document.querySelector('.form-user-data');
 const userSettingsForm = document.querySelector('.form-user-settings');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const formForgot = document.querySelector('.form--forgot');
+const formReset = document.querySelector('.form--reset');
 const bookBtn = document.getElementById('book-tour');
 //DELEGATION
 if (mapbox) {
@@ -81,6 +82,14 @@ if (formForgot) {
     e.preventDefault();
     const email = document.getElementById('email').value;
     forgotPassword(email);
+  });
+}
+if (formReset) {
+  formReset.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    resetPassword(password, passwordConfirm);
   });
 }
 if (bookBtn) {
