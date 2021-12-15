@@ -6,6 +6,7 @@ import { updateSettings } from './updateSettings.js';
 import { signup } from './signup.js';
 import { forgotPassword } from './forgotPassword.js';
 import { bookTour } from './stripe';
+import { showAlert } from './alerts';
 //DOM ELEMENTS
 
 const mapbox = document.getElementById('map');
@@ -89,3 +90,5 @@ if (bookBtn) {
     bookTour(tourId);
   });
 }
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alert) showAlert('success', alertMessage, 20);
