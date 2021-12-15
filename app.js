@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xssClean = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
+const cors = require('cors');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -30,9 +31,20 @@ const pathTours = '/api/v1/tours';
 const pathUsers = '/api/v1/users';
 const pathBookings = '/api/v1/bookings';
 //// Global middle wares
+//Implement Cors
+app.use(cors());
+
+//Acces allow origin
+//API: api.natours.com FrontEnd : natours.com
+// app.use(
+//   cors({
+//     origin: 'https://www.natours.com',
+//   })
+// );
+//ALLOW COMPLEX REQUESTS TO FOLLOW THE OPTIONS STAGE (PUT PATCH DELETE)
+app.options('*', cors());
 //Security http headers
 // app.use(helmet());
-
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
