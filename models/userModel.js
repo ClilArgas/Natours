@@ -122,7 +122,7 @@ userSchema.methods.protectBruteAtt = function () {
   // console.log(this.numAttempts);
   if (this.numAttempts === 0) {
     this.numAttempts = 10;
-    this.waitTimeAfterFailedLogin = Date.now() + 15 * 1000;
+    this.waitTimeAfterFailedLogin = Date.now() + 60 * 1000;
   }
 };
 

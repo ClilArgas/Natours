@@ -13,14 +13,23 @@ const signToken = (id) =>
 
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
-
-  res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    secure: req.secure || req.headers('x-forwarded-proto') === 'https',
-  });
+  // in development req.headers is undefined and its not https.
+  if (process.env.NODE_ENV === 'development') {
+    res.cookie('jwt', token, {
+      expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+    });
+  } else {
+    res.cookie('jwt', token, {
+      expires: new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+      ),
+      httpOnly: true,
+      secure: req.secure || req.headers('x-forwarded-proto') === 'https',
+    });
+  }
   user.password = undefined;
 
   res.status(statusCode).json({
@@ -57,7 +66,9 @@ exports.login = catchAsync(async (req, res, next) => {
     user.waitTimeAfterFailedLogin &&
     user.waitTimeAfterFailedLogin > Date.now()
   )
-    return next(new AppError('You have only 10 times to log in an hour', 400));
+    return next(
+      new AppError('You have only 10 attempts to log in an hour', 400)
+    );
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     user.protectBruteAtt();

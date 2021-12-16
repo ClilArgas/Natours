@@ -4,10 +4,20 @@ const User = require('../models/userModel');
 const Booking = require('./../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlersFactory');
+const AppError = require('../utils/appError');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  //1) get the current tour
+  //1) get the current tour & check if it fully booked
   const tour = await Tour.findById(req.params.tourId);
+  if (tour.spotsAvailable === 0)
+    return next(
+      new AppError(
+        'There is no more room left on this tour.. Book next year',
+        400
+      )
+    );
+  tour.spotsAvailable -= 1;
+  await tour.save({ validateBeforeSave: false });
   //2)create checout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],

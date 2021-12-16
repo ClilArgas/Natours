@@ -81,6 +81,7 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    spotsAvailable: Number,
     startLocation: {
       type: {
         type: String,
@@ -138,6 +139,11 @@ tourSchema.virtual('reviews', {
 // Document middle ware
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+tourSchema.pre('save', function (next) {
+  if (this.spotsAvailable) return next();
+  this.spotsAvailable = this.maxGroupSize * this.startDates.length;
   next();
 });
 ////////////////
