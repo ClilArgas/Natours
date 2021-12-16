@@ -6,6 +6,18 @@ const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlersFactory');
 const AppError = require('../utils/appError');
 
+exports.checkIfBooked = catchAsync(async (req, res, next) => {
+  const booking = await Booking.find({
+    user: req.user.id,
+    tour: req.body.tour,
+  });
+  if (booking.length === 0)
+    return next(
+      new AppError('You need to buy a tour before reviewing it', 401)
+    );
+  next();
+});
+
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //1) get the current tour & check if it fully booked
   const tour = await Tour.findById(req.params.tourId);
