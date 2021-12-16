@@ -76,7 +76,19 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
-    startDates: [Date],
+    startDates: [
+      {
+        date: {
+          type: Date,
+          required: [true, 'A tour must have a Start Date'],
+        },
+        participants: {
+          type: Number,
+          default: 0,
+        },
+        maxParticipants: Number,
+      },
+    ],
     secretTour: {
       type: Boolean,
       default: false,
@@ -144,6 +156,14 @@ tourSchema.pre('save', function (next) {
 tourSchema.pre('save', function (next) {
   if (this.spotsAvailable) return next();
   this.spotsAvailable = this.maxGroupSize * this.startDates.length;
+  next();
+});
+tourSchema.pre('save', function (next) {
+  const max = this.maxGroupSize;
+  this.startDates.forEach((date) => {
+    if (date.maxParticipants) return;
+    date.maxParticipants = max;
+  });
   next();
 });
 ////////////////
