@@ -5,6 +5,7 @@ const Booking = require('./../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlersFactory');
 const AppError = require('../utils/appError');
+const Email = require('./../utils/email');
 
 exports.checkIfBooked = catchAsync(async (req, res, next) => {
   const booking = await Booking.find({
@@ -75,6 +76,10 @@ const createBookingCheckout = catchAsync(async (session) => {
   const user = (await User.findOne({ email: session.customer_email }))._id;
   const price = session.amount_total / 100;
   await Booking.create({ tour, user, price, tourDate });
+  await new Email(
+    user,
+    session.success_url.split('?')[0]
+  ).sendBookingConfirmation();
 });
 
 exports.webhookCheckout = async (req, res, next) => {
