@@ -18,6 +18,7 @@ const logOutBtn = document.querySelector('.nav__el--logout');
 const formForgot = document.querySelector('.form--forgot');
 const formReset = document.querySelector('.form--reset');
 const bookBtn = document.getElementById('book-tour');
+const tourDates = document.querySelector('.selectStartDate');
 //DELEGATION
 if (mapbox) {
   const locations = JSON.parse(
@@ -96,8 +97,8 @@ if (bookBtn) {
   bookBtn.addEventListener('click', (e) => {
     e.target.textContent = 'Processing...';
     const { tourId } = e.target.dataset;
-    bookTour(tourId);
-    e.target.textContent = 'Book tour now!';
+    const startDate = tourDates.value;
+    bookTour(tourId, startDate);
   });
 }
 const alertMessage = document.querySelector('body').dataset.alert;

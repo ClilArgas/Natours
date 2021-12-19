@@ -21,15 +21,15 @@ exports.checkIfBooked = catchAsync(async (req, res, next) => {
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //1) get the current tour & check if it fully booked
   const tour = await Tour.findById(req.params.tourId);
-  if (tour.spotsAvailable === 0)
-    return next(
-      new AppError(
-        'There is no more room left on this tour.. Book next year',
-        400
-      )
-    );
-  tour.spotsAvailable -= 1;
-  await tour.save({ validateBeforeSave: false });
+  // if (tour.spotsAvailable === 0)
+  //   return next(
+  //     new AppError(
+  //       'There is no more room left on this tour.. Book next year',
+  //       400
+  //     )
+  //   );
+  // tour.spotsAvailable -= 1;
+  // await tour.save({ validateBeforeSave: false });
   //2)create checout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -39,7 +39,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
-    client_reference_id: req.params.tourId,
+    client_reference_id: `${req.params.tourId}/${req.params.tourDate}`,
     line_items: [
       {
         name: `${tour.name} Tour`,
@@ -68,13 +68,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 //   res.redirect(req.originalUrl.split('?')[0]);
 // });
 const createBookingCheckout = catchAsync(async (session) => {
-  const tour = session.client_reference_id;
+  // const strArr = session.client_reference_id.split('/');
+  const dataArr = session.client_reference_id.split('-');
+  const tour = dataArr[0];
+  const tourDate = dataArr[1];
   const user = (await User.findOne({ email: session.customer_email }))._id;
   const price = session.amount_total / 100;
-  await Booking.create({ tour, user, price });
+  await Booking.create({ tour, user, price, tourDate });
 });
 
-exports.webhookCheckout = (req, res, next) => {
+exports.webhookCheckout = async (req, res, next) => {
   const signature = req.headers['stripe-signature'];
   let event;
   try {

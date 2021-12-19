@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
+const AppError = require('./../utils/appError');
 
 const bookingSchema = new mongoose.Schema({
   tour: {
@@ -23,6 +25,7 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  tourDate: String,
 });
 
 bookingSchema.pre(/^find/, function (next) {
@@ -31,6 +34,22 @@ bookingSchema.pre(/^find/, function (next) {
     select: 'name',
   });
   next();
+});
+bookingSchema.pre('save', async function (next) {
+  try {
+    const tour = await Tour.findById(this.tour);
+    const startDate = tour.startDates.filter(
+      (date) => date._id == this.tourDate
+    );
+    // const startDate = tour.startDates.id(this.date);
+    if (startDate[0].participants >= startDate[0].maxParticipants)
+      return next(new AppError('Tour is fully book on this date...', 401));
+    startDate[0].participants += 1;
+    await tour.save();
+    next();
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);

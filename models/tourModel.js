@@ -153,11 +153,11 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-tourSchema.pre('save', function (next) {
-  if (this.spotsAvailable) return next();
-  this.spotsAvailable = this.maxGroupSize * this.startDates.length;
-  next();
-});
+// tourSchema.pre('save', function (next) {
+//   if (this.spotsAvailable) return next();
+//   this.spotsAvailable = this.maxGroupSize * this.startDates.length;
+//   next();
+// });
 tourSchema.pre('save', function (next) {
   const max = this.maxGroupSize;
   this.startDates.forEach((date) => {
