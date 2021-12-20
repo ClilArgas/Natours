@@ -73,9 +73,9 @@ const createBookingCheckout = catchAsync(async (session) => {
   const dataArr = session.client_reference_id.split('-');
   const tour = dataArr[0];
   const tourDate = dataArr[1];
-  const user = (await User.findOne({ email: session.customer_email }))._id;
+  const user = await User.findOne({ email: session.customer_email });
   const price = session.amount_total / 100;
-  await Booking.create({ tour, user, price, tourDate });
+  await Booking.create({ tour, user: user._id, price, tourDate });
   await new Email(
     user,
     session.success_url.split('?')[0]
@@ -99,6 +99,10 @@ exports.webhookCheckout = async (req, res, next) => {
   res.status(200).json({
     received: true,
   });
+};
+exports.setTour = (req, res, next) => {
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  next();
 };
 
 exports.getAllBookings = factory.getAll(Booking);
